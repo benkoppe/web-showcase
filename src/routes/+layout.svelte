@@ -12,7 +12,7 @@
 
 	const PAGE_TITLE = 'Web Showcase';
 
-	const NAV_BUTTONS = [{ title: 'GitHub', link: 'https://github.com/' }];
+	const NAV_BUTTONS = [{ title: 'GitHub', link: 'https://github.com/benkoppe/web-showcase' }];
 
 	const APP_TILES = [
 		{
