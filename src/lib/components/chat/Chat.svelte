@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, createEventDispatcher } from 'svelte';
-	import { Avatar, ProgressRadial } from '@skeletonlabs/skeleton';
+	import { Avatar } from '@skeletonlabs/skeleton';
 
 	import { chatStore } from './chat_store';
 	import ChatBubble from './ChatBubble.svelte';
@@ -18,6 +18,15 @@
 	$: currentBot = $chatStore.bots.find((bot) => bot.id === currentBotId);
 	$: chats = $chatStore.messages.filter((chat) => chat.botId === currentBotId);
 
+	let inputDisabled = false;
+	$: if (typeof currentBot === 'undefined') {
+		inputDisabled = true;
+	} else if (chats.length > 0 && chats[chats.length - 1].loading) {
+		inputDisabled = true;
+	} else {
+		inputDisabled = false;
+	}
+
 	// Functions
 	function scrollChatBottom(behavior?: ScrollBehavior): void {
 		elemChat.scrollTo({
@@ -29,6 +38,8 @@
 	function addUserMessage(): void {
 		// catch empty messages
 		if (!currentMessage) return;
+		// catch disabled input
+		if (inputDisabled) return;
 
 		chatStore.addMessage(currentBotId, false, currentMessage);
 
@@ -68,7 +79,12 @@
 	}
 
 	function addBot(): void {
-		const newId = chatStore.addBot(`ChatGPT ${$chatStore.bots.length + 1}`);
+		const oldNums = $chatStore.bots
+			.map((bot) => bot.name)
+			.map((name) => parseInt(name.split(' ')[1]) || 0);
+		const newNum = Math.max(...oldNums) + 1;
+
+		const newId = chatStore.addBot(`ChatGPT ${newNum}`);
 		currentBotId = newId;
 		addBotMessage(newId, 'Hello! How can I help you today?');
 	}
@@ -77,7 +93,11 @@
 		chatStore.removeBot(id);
 
 		if (id === currentBotId) {
-			currentBotId = $chatStore.bots[0].id;
+			if ($chatStore.bots.length > 0) {
+				currentBotId = $chatStore.bots[0].id;
+			} else {
+				currentBotId = 0;
+			}
 		}
 	}
 
@@ -91,6 +111,11 @@
 	// when DOM mounts, scroll to bottom
 	onMount(() => {
 		scrollChatBottom();
+
+		// add initial bot
+		if ($chatStore.bots.length === 0) {
+			addBot();
+		}
 	});
 </script>
 
@@ -158,6 +183,9 @@
 						timestamp={chat.timestamp}
 					/>
 				{/each}
+				{#if chats.length === 0}
+					<p class="text-center opacity-50">No messages yet.</p>
+				{/if}
 			</section>
 			<!-- Prompt -->
 			<section class="border-t border-surface-500/30 p-4">
@@ -173,6 +201,7 @@
 					></textarea>
 					<button
 						class={currentMessage ? 'variant-filled-primary' : 'input-group-shim'}
+						disabled={inputDisabled}
 						on:click={addUserMessage}
 					>
 						<i class="fa-solid fa-paper-plane"></i>
