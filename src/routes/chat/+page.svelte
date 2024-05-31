@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Chat from '$lib/components/chat/Chat.svelte';
-	import type { Message } from '$lib/components/chat/chat_store.ts';
+	import type { Message } from '$lib/components/chat/chat_store';
 
 	interface OpenAIMessage {
 		role: 'system' | 'user' | 'assistant';
