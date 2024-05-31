@@ -79,10 +79,15 @@
 	}
 
 	function addBot(): void {
-		const oldNums = $chatStore.bots
-			.map((bot) => bot.name)
-			.map((name) => parseInt(name.split(' ')[1]) || 0);
-		const newNum = Math.max(...oldNums) + 1;
+		let newNum = 1;
+
+		if ($chatStore.bots.length > 0) {
+			const oldNums = $chatStore.bots
+				.map((bot) => bot.name)
+				.map((name) => parseInt(name.split(' ')[1]) || 0);
+
+			newNum = Math.max(...oldNums) + 1;
+		}
 
 		const newId = chatStore.addBot(`ChatGPT ${newNum}`);
 		currentBotId = newId;
