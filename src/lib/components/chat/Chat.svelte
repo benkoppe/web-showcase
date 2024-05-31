@@ -11,7 +11,7 @@
 	let elemChat: HTMLElement;
 
 	// Reactive Variables
-	let currentBotId: number = $chatStore.bots[0].id;
+	let currentBotId: number = $chatStore.bots[0]?.id || 0;
 	let currentMessage = '';
 
 	// Computed Variables
