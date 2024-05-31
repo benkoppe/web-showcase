@@ -54,4 +54,6 @@
 	}
 </script>
 
+<h1 class="text-2xl sm:text-4xl pb-3">AI Chat</h1>
+
 <Chat on:message={onUserMessage} />
